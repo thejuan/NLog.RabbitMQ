@@ -1,8 +1,8 @@
 bin/
 obj/
+build/
 *.user
 _ReSharper*
 *.resharper
 *.suo
-build/
 SharedAssemblyInfo.cs
