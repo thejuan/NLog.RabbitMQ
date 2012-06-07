@@ -105,7 +105,7 @@ task :versioning do
     raise "Version #{v.to_s} has already been released! You cannot release it twice."
   end
   puts 'committing'
-  `git commit -am "Released version #{v.to_s}"` 
+  `git commit --amend -am "Released version #{v.to_s}"` 
   puts 'tagging'
   `git tag #{v.to_s}`
   puts 'pushing'

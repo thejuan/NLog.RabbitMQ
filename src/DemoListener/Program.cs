@@ -54,6 +54,8 @@ namespace DemoListener
 									if (msg.BasicProperties.IsAppIdPresent())
 										Console.Write(msg.BasicProperties.AppId + " ");
 
+									if(!String.IsNullOrEmpty(msg.RoutingKey))
+										Console.Write(msg.RoutingKey + " ");
 									var asUtf8String = msg.Body.AsUtf8String();
 									Console.WriteLine(asUtf8String);
 									WriteToFile(asUtf8String);
