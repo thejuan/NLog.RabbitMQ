@@ -9,6 +9,8 @@ using RabbitMQ.Client.Framing.v0_9_1;
 
 namespace NLog.Targets
 {
+	using NLog.Layouts;
+
 	/// <summary>
 	/// A RabbitMQ-target for NLog. See https://github.com/haf/NLog.RabbitMQ for documentation in Readme.md.
 	/// </summary>
@@ -75,7 +77,7 @@ namespace NLog.Targets
 			set { _Port = value; }
 		}
 
-		private string _Topic = "{0}";
+		private Layout _Topic = "{0}";
 
 		///<summary>
 		///	Gets or sets the routing key (aka. topic) with which
@@ -83,7 +85,7 @@ namespace NLog.Targets
 		///	so on. An example could be setting this property to 'ApplicationType.MyApp.Web.{0}'.
 		///	The default is '{0}'.
 		///</summary>
-		public string Topic
+		public Layout Topic
 		{
 			get { return _Topic; }
 			set { _Topic = value; }
@@ -183,7 +185,7 @@ namespace NLog.Targets
 		{
 			var basicProperties = GetBasicProperties(logEvent);
 			var message = GetMessage(logEvent);
-			var routingKey = string.Format(_Topic, logEvent.LogEvent.Level.Name);
+			var routingKey = this.GetTopic(logEvent.LogEvent);
 
 			if (_Model == null || !_Model.IsOpen)
 				StartConnection();
@@ -237,9 +239,16 @@ namespace NLog.Targets
 		private void Publish(byte[] bytes, IBasicProperties basicProperties, string routingKey)
 		{
 			_Model.BasicPublish(_Exchange,
-			                    routingKey,
-			                    true, false, basicProperties,
-			                    bytes);
+								routingKey,
+								true, false, basicProperties,
+								bytes);
+		}
+
+		private string GetTopic(LogEventInfo eventInfo)
+		{
+			var routingKey = _Topic.Render(eventInfo);
+			routingKey = routingKey.Replace("{0}", eventInfo.Level.Name);
+			return routingKey;
 		}
 
 		private byte[] GetMessage(AsyncLogEventInfo logEvent)
@@ -350,7 +359,7 @@ namespace NLog.Targets
 		protected override void CloseTarget()
 		{
 			ShutdownAmqp(_Connection,
-			             new ShutdownEventArgs(ShutdownInitiator.Application, Constants.ReplySuccess, "closing appender"));
+						 new ShutdownEventArgs(ShutdownInitiator.Application, Constants.ReplySuccess, "closing appender"));
 			
 			base.CloseTarget();
 		}
