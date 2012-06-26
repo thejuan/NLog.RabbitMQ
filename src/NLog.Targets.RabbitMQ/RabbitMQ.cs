@@ -310,7 +310,7 @@ namespace NLog.Targets
 				try { _Model = _Connection.CreateModel(); }
 				catch (Exception e)
 				{
-					InternalLogger.Error("could not create model", e);
+					InternalLogger.Error("could not create model, {0}", e);
 				}
 
 				if (_Model != null)
@@ -318,7 +318,7 @@ namespace NLog.Targets
 			}
 			catch (Exception e)
 			{
-				InternalLogger.Error("could not connect to Rabbit instance", e);
+				InternalLogger.Error(string.Format("could not connect to Rabbit instance, {0}", e));
 			}
 		}
 
@@ -350,7 +350,7 @@ namespace NLog.Targets
 			}
 			catch (Exception e)
 			{
-				InternalLogger.Error("could not close model", e);
+				InternalLogger.Error("could not close model, {0}", e);
 			}
 
 			try
@@ -364,7 +364,7 @@ namespace NLog.Targets
 			}
 			catch (Exception e)
 			{
-				InternalLogger.Error("could not close connection", e);
+				InternalLogger.Error("could not close connection, {0}", e);
 			}
 		}
 

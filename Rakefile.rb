@@ -59,13 +59,10 @@ task :output => [:nr_output, :l_output]
 task :ilmerge => :output do |cfg|
   folder = File.join(FOLDERS[:binaries], PROJECTS[:nr][:id])
   Dir.chdir folder do |d|
-    system 'echo Newtonsoft.Json.dll >internalize.txt'
-    system '../../../../tools/ILMerge.exe /internalize /allowDup /xmldocs NLog.Targets.RabbitMQ.dll Newtonsoft.Json.dll /out:NLog.Targets.RabbitMQ.M.dll /v4'
-    FileUtils.rm "Newtonsoft.Json.dll"
-    FileUtils.rm "NLog.Targets.RabbitMQ.dll"
-    FileUtils.mv "NLog.Targets.RabbitMQ.M.dll", "NLog.Targets.RabbitMQ.dll"
-    FileUtils.mv "NLog.Targets.RabbitMQ.M.xml", "NLog.Targets.RabbitMQ.xml"
-    FileUtils.mv "NLog.Targets.RabbitMQ.M.pdb", "NLog.Targets.RabbitMQ.pdb"
+    FileUtils.mkdir 'tmp'
+    Dir.glob("./*.*").each{ |f| FileUtils.mv f, 'tmp' }
+    system '../../../../tools/ILMerge.exe /internalize /allowDup /xmldocs tmp\NLog.Targets.RabbitMQ.dll tmp\Newtonsoft.Json.dll /out:NLog.Targets.RabbitMQ.dll /v4'
+    FileUtils.rm_rf 'tmp'
   end
 end
 

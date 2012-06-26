@@ -4,7 +4,7 @@
         Title="RabbitMQ Logging" Height="212" Width="525">
     <StackPanel>
 		<Button Name="Trace" Click="Button_Click">Trace</Button>
-		<Button Name="Debug" Click="Button_Click">Debug</Button>
+		<Button Name="Debug" Click="Button_Click">Debug and Tag</Button>
 		<Button Name="Info" Click="Button_Click">Info</Button>
 		<Button Name="Warn" Click="Button_Click">Warn</Button>
 		<Button Name="Error" Click="Button_Click">Error</Button>

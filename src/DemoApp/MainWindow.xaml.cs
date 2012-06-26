@@ -27,7 +27,7 @@ namespace DemoApp
 					logger.Trace("This is a sample trace message");
 					break;
 				case "Debug":
-					logger.Debug("This is a sample debug message");
+					logger.DebugTag("This is a sample debug message", "important");
 					break;
 				case "Info":
 					logger.Info("This is a sample info message");

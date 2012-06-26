@@ -32,7 +32,7 @@ You will find the listener tool in the nuget `tools` folder.
 				port="5672"
 				topic="DemoApp.Logging.{0}"
 				vhost="/"
-				durable="false"
+				durable="true"
 				appid="NLog.RabbitMQ.DemoApp"
 				maxBuffer="10240"
 				heartBeatSeconds="3"
