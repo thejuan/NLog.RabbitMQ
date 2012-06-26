@@ -21,6 +21,7 @@ namespace :env do
   # configure the output directories
   task :configure, [:str] do |_, args|
     ENV['CONFIGURATION'] = CONFIGURATION = args[:str]
+    FileUtils.rm_rf FOLDERS[:build]
     FOLDERS[:binaries] = File.join(FOLDERS[:build], FRAMEWORK, args[:str].downcase)
     CLEAN.include(File.join(FOLDERS[:binaries], "*"))
   end

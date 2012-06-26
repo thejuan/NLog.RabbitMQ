@@ -52,8 +52,8 @@ task :l_output => [:msbuild] do
   FileUtils.mkdir_p "build/#{FRAMEWORK}/#{CONFIGURATION}/listener"
   copy_files "src/nlog-rmq-listener/bin/#{CONFIGURATION}", "*.{config,exe,dll}", "build/#{FRAMEWORK}/#{CONFIGURATION}/listener"
 end
-
 task :output => [:nr_output, :l_output]
+
 task :ilmerge => :output do |cfg|
   folder = File.join(FOLDERS[:binaries], PROJECTS[:nr][:id])
   Dir.chdir folder do |d|
