@@ -9,9 +9,14 @@ namespace NLog.Targets
 	{
 		[JsonProperty("timeStampISO8601")]
 		public string TimeStampISO8601 { get; set; }
+
 		[JsonProperty("fullMessage")]
 		public string FullMessage { get; set; }
+
 		[JsonProperty("exception")]
 		public Exception Exception { get; set; }
+
+		[JsonProperty("hostName")]
+		public string HostName { get; set; }
 	}
 }
