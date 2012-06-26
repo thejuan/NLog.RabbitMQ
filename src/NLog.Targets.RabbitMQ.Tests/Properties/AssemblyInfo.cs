@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DemoListener")]
+[assembly: AssemblyTitle("NLog.Targets.RabbitMQ.Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("DemoListener")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2011")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("NLog.Targets.RabbitMQ.Tests")]
+[assembly: AssemblyCopyright("Copyright ©  2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("aecf28ae-c534-4243-b918-5e5734c558b6")]
+[assembly: Guid("eb51f03d-6c49-4792-8961-a35f6869a893")]
 
 // Version information for an assembly consists of the following four values:
 //

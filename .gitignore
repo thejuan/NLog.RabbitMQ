@@ -6,3 +6,4 @@ _ReSharper*
 *.resharper
 *.suo
 SharedAssemblyInfo.cs
+packages/

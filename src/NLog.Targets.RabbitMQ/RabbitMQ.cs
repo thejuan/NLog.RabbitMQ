@@ -6,11 +6,10 @@ using System.Text;
 using NLog.Common;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Framing.v0_9_1;
+using NLog.Layouts;
 
 namespace NLog.Targets
 {
-	using NLog.Layouts;
-
 	/// <summary>
 	/// A RabbitMQ-target for NLog. See https://github.com/haf/NLog.RabbitMQ for documentation in Readme.md.
 	/// </summary>
@@ -20,9 +19,13 @@ namespace NLog.Targets
 		private IConnection _Connection;
 		private IModel _Model;
 		private readonly Encoding _Encoding = Encoding.UTF8;
-		private readonly DateTime _Epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0);
 		private readonly Queue<Tuple<byte[], IBasicProperties, string>> _UnsentMessages
 			= new Queue<Tuple<byte[], IBasicProperties, string>>(512);
+
+		public RabbitMQ()
+		{
+			Layout = "${message}";
+		}
 
 		#region Properties
 
@@ -165,7 +168,7 @@ namespace NLog.Targets
 			set { if (value > 0) _MaxBuffer = value; }
 		}
 
-		private ushort _heartBeatSeconds = 3;
+		ushort _HeartBeatSeconds = 3;
 
 		/// <summary>
 		/// Gets or sets the number of heartbeat seconds to have for the RabbitMQ connection.
@@ -174,10 +177,26 @@ namespace NLog.Targets
 		/// </summary>
 		public ushort HeartBeatSeconds
 		{
-			get { return _heartBeatSeconds; }
-			set {  _heartBeatSeconds = value; }
+			get { return _HeartBeatSeconds; }
+			set {  _HeartBeatSeconds = value; }
 		}
 
+		bool _UseJSON;
+
+		/// <summary>
+		/// Gets or sets whether to format the data in the body as a JSON structure.
+		/// Having it as a JSON structure means that you can more easily interpret the data
+		/// at its final resting place, than if it were a simple string - i.e. you don't
+		/// have to mess with advanced parsers if you have this options for all of your
+		/// applications. A product that you can use for viewing logs
+		/// generated is logstash (http://logstash.net), elasticsearch (https://github.com/elasticsearch/elasticsearch)
+		/// and kibana (http://rashidkpc.github.com/Kibana/)
+		/// </summary>
+		public bool UseJSON
+		{
+			get { return _UseJSON; }
+			set { _UseJSON = value; }
+		}
 
 		#endregion
 
@@ -251,28 +270,23 @@ namespace NLog.Targets
 			return routingKey;
 		}
 
-		private byte[] GetMessage(AsyncLogEventInfo logEvent)
+		private byte[] GetMessage(AsyncLogEventInfo info)
 		{
-			return _Encoding.GetBytes(Layout.Render(logEvent.LogEvent));
+			return _Encoding.GetBytes(MessageFormatter.GetMessageInner(_UseJSON, Layout, info.LogEvent));
 		}
-
 
 		private IBasicProperties GetBasicProperties(AsyncLogEventInfo loggingEvent)
 		{
 			var @event = loggingEvent.LogEvent;
-			
-			var basicProperties = new BasicProperties();
-			basicProperties.ContentEncoding = "utf8";
-			basicProperties.ContentType = "text/plain";
-			basicProperties.AppId = AppId ?? @event.LoggerName;
 
-			basicProperties.Timestamp = new AmqpTimestamp(
-				Convert.ToInt64((@event.TimeStamp - _Epoch).TotalSeconds));
-
-			// support Validated User-ID (see http://www.rabbitmq.com/extensions.html)
-			basicProperties.UserId = UserName;
-
-			return basicProperties;
+			return new BasicProperties
+				{
+					ContentEncoding = "utf8",
+					ContentType = _UseJSON ? "application/json" : "text/plain",
+					AppId = AppId ?? @event.LoggerName,
+					Timestamp = new AmqpTimestamp(MessageFormatter.GetEpochTimeStamp(@event)),
+					UserId = UserName // support Validated User-ID (see http://www.rabbitmq.com/extensions.html)
+				};
 		}
 
 		protected override void InitializeTarget()
@@ -296,7 +310,7 @@ namespace NLog.Targets
 				try { _Model = _Connection.CreateModel(); }
 				catch (Exception e)
 				{
-					InternalLogger.Error("could not create model", e);
+					InternalLogger.Error("could not create model, {0}", e);
 				}
 
 				if (_Model != null)
@@ -304,7 +318,7 @@ namespace NLog.Targets
 			}
 			catch (Exception e)
 			{
-				InternalLogger.Error("could not connect to Rabbit instance", e);
+				InternalLogger.Error(string.Format("could not connect to Rabbit instance, {0}", e));
 			}
 		}
 
@@ -336,7 +350,7 @@ namespace NLog.Targets
 			}
 			catch (Exception e)
 			{
-				InternalLogger.Error("could not close model", e);
+				InternalLogger.Error("could not close model, {0}", e);
 			}
 
 			try
@@ -350,7 +364,7 @@ namespace NLog.Targets
 			}
 			catch (Exception e)
 			{
-				InternalLogger.Error("could not close connection", e);
+				InternalLogger.Error("could not close connection, {0}", e);
 			}
 		}
 

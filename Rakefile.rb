@@ -44,11 +44,28 @@ end
 
 task :nr_output => [:msbuild] do
   target = File.join(FOLDERS[:binaries], PROJECTS[:nr][:id])
-  copy_files FOLDERS[:nr][:out], "*.{xml,dll,pdb,config}", target
+  copy_files FOLDERS[:nr][:out], "*.{xml,dll}", target
   CLEAN.include(target)
 end
 
-task :output => [:nr_output]
+task :l_output => [:msbuild] do
+  FileUtils.mkdir_p "build/#{FRAMEWORK}/#{CONFIGURATION}/listener"
+  copy_files "src/nlog-rmq-listener/bin/#{CONFIGURATION}", "*.{config,exe,dll}", "build/#{FRAMEWORK}/#{CONFIGURATION}/listener"
+  copy_files "src/nlog-rmq-listener/bin/#{CONFIGURATION}", "*.{config,exe,dll}", "build/nuspec/NLog.RabbitMQ/tools"
+end
+
+task :output => [:nr_output, :l_output]
+
+task :ilmerge => :output do |cfg|
+  folder = File.join(FOLDERS[:binaries], PROJECTS[:nr][:id])
+  Dir.chdir folder do |d|
+    FileUtils.mkdir 'tmp'
+    Dir.glob("./*.*").each{ |f| FileUtils.mv f, 'tmp' }
+    system '../../../../tools/ILMerge.exe /internalize /allowDup /xmldocs tmp\NLog.Targets.RabbitMQ.dll tmp\Newtonsoft.Json.dll /out:NLog.Targets.RabbitMQ.dll /v4'
+    FileUtils.rm_rf 'tmp'
+  end
+end
+
 task :nuspecs => [:nr_nuspec]
 
 desc "Create a nuspec for 'NLog.Targets.RabbitMQ'"
@@ -84,7 +101,7 @@ nugetpush :nr_nuget_push do |nuget|
   nuget.package = "#{File.join(FOLDERS[:nuget], PROJECTS[:nr][:nuget_key] + "." + BUILD_VERSION + '.nupkg')}"
 end
 
-task :default  => ["env:release", "assemblyinfo", "msbuild", "output", "nugets"]
+task :default  => ["env:release", "assemblyinfo", "msbuild", "output", "ilmerge", "nugets"]
 
 desc "publish nugets! (doesn't build)"
 task :publish => [:"env:release", :nr_nuget_push]
