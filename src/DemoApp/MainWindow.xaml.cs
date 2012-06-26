@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using NLog;
 
@@ -40,7 +41,28 @@ namespace DemoApp
 				case "Fatal":
 					logger.Fatal("This is a sample fatal message");
 					break;
+				case "ErrorWException":
+					logger.ErrorException("Oh noes (error)",
+						PerformIntricateCalulation());
+					break;
 			}
+		}
+
+		Exception PerformIntricateCalulation()
+		{
+			try
+			{
+				var sleepSheep = 100;
+				var counted = 0;
+				var perCentInverse = sleepSheep/counted;
+				Console.WriteLine("You are inversely at infinite sleep, here's the largest number possible, {0}", 
+					perCentInverse);
+			}
+			catch (Exception e)
+			{
+				return e;
+			}
+			throw new Exception("compile darn it");
 		}
 
 		protected override void OnClosed(System.EventArgs e)
