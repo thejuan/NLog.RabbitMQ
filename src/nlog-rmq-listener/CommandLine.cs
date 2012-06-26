@@ -1919,8 +1919,9 @@ namespace NLog.Targets.RabbitMQ.Listener
 		public static TAttribute GetAttribute<TAttribute>()
 			where TAttribute : Attribute
 		{
-			object[] a = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(TAttribute), false);
-			if (a == null || a.Length <= 0) return null;
+			var assembly = Assembly.GetExecutingAssembly();
+			object[] a = assembly.GetCustomAttributes(typeof(TAttribute), false);
+			if (a.Length <= 0) return null;
 			return (TAttribute)a[0];
 		}
 

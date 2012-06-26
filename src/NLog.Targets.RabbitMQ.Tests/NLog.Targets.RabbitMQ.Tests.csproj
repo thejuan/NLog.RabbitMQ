@@ -54,12 +54,17 @@
   <ItemGroup>
     <Compile Include="DateTimeTests.cs" />
     <Compile Include="MessageFormatterTests.cs" />
+    <Compile Include="DurableFlagsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\nlog-rmq-listener\nlog-rmq-listener.csproj">
+      <Project>{47170614-99C4-47CE-B7FD-1BBCC1BE1839}</Project>
+      <Name>nlog-rmq-listener</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NLog.Targets.RabbitMQ\NLog.Targets.RabbitMQ.csproj">
       <Project>{26B036BC-6F6C-42F2-995E-5016D0D0FA8F}</Project>
       <Name>NLog.Targets.RabbitMQ</Name>
