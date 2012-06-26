@@ -20,7 +20,6 @@ namespace NLog.Targets
 		private IConnection _Connection;
 		private IModel _Model;
 		private readonly Encoding _Encoding = Encoding.UTF8;
-		private readonly DateTime _Epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0);
 		private readonly Queue<Tuple<byte[], IBasicProperties, string>> _UnsentMessages
 			= new Queue<Tuple<byte[], IBasicProperties, string>>(512);
 
@@ -269,10 +268,7 @@ namespace NLog.Targets
 
 		private byte[] GetMessage(AsyncLogEventInfo info)
 		{
-			if (!_UseJSON)
-				return _Encoding.GetBytes(Layout.Render(info.LogEvent));
-
-
+			return _Encoding.GetBytes(MessageFormatter.GetMessageInner(_UseJSON, Layout, info.LogEvent));
 		}
 
 		private IBasicProperties GetBasicProperties(AsyncLogEventInfo loggingEvent)
@@ -284,8 +280,7 @@ namespace NLog.Targets
 					ContentEncoding = "utf8",
 					ContentType = _UseJSON ? "application/json" : "text/plain",
 					AppId = AppId ?? @event.LoggerName,
-					Timestamp = new AmqpTimestamp(
-						Convert.ToInt64((@event.TimeStamp - _Epoch).TotalSeconds)),
+					Timestamp = new AmqpTimestamp(MessageFormatter.GetEpochTimeStamp(@event)),
 					UserId = UserName // support Validated User-ID (see http://www.rabbitmq.com/extensions.html)
 				};
 		}
