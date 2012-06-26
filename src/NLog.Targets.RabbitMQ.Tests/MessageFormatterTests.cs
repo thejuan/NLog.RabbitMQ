@@ -1,5 +1,6 @@
 ﻿// Copyright 2012 Henrik Feldt
 
+using System;
 using System.Globalization;
 using NLog.Layouts;
 using NUnit.Framework;
@@ -37,8 +38,9 @@ namespace NLog.Targets.RabbitMQ.Tests
 		public void contains_message()
 		{
 			var res = MessageFormatter.GetMessageInner(true, l, evt);
+			Console.WriteLine(res);
 			dynamic json = JsonConvert.DeserializeObject(res);
-			Assert.That(json.fullMessage.ToString(), Is.EqualTo("Hello World"));
+			Assert.That(json.message.ToString(), Is.EqualTo("Hello World"));
 		}
 
 		[Test]
