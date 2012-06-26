@@ -8,8 +8,8 @@
     <ProjectGuid>{47170614-99C4-47CE-B7FD-1BBCC1BE1839}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DemoListener</RootNamespace>
-    <AssemblyName>DemoListener</AssemblyName>
+    <RootNamespace>NLog.Targets.RabbitMQ.Listener</RootNamespace>
+    <AssemblyName>nlog-rmq-listener</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
