@@ -1,6 +1,10 @@
 # RabbitMQ target for NLog
 
-The RabbitMQ target writes asynchronously to a RabbitMQ instance.
+The RabbitMQ target writes asynchronously to a RabbitMQ instance. Either use this repo, ur get the nuget:
+
+`Install-Package NLog.RabbitMQ`
+
+You will find the listener tool in the nuget `tools` folder.
 
 ##Configuration:
 
@@ -15,7 +19,7 @@ The RabbitMQ target writes asynchronously to a RabbitMQ instance.
 		<add assembly="NLog.Targets.RabbitMQ" />
 	</extensions>
 
-	<targets>
+	<targets async="true">
 		<!-- when http://nlog.codeplex.com/workitem/6491 is fixed, then xsi:type="haf:RabbitMQ" instead;
 			 these are the defaults (except 'topic' and 'appid'): 
 		-->
@@ -32,7 +36,38 @@ The RabbitMQ target writes asynchronously to a RabbitMQ instance.
 				appid="NLog.RabbitMQ.DemoApp"
 				maxBuffer="10240"
 				heartBeatSeconds="3"
-				layout="${longdate}|${level:uppercase=true}|${logger}|${message}"
+				useJSON="true"
+				layout="${message}"
+				/>
+	</targets>
+
+	<rules>
+		<logger name="*" minlevel="Trace" writeTo="RabbitMQTarget"/>
+	</rules>
+
+</nlog>
+```
+
+Minimum target recommended:
+```
+<?xml version="1.0" encoding="utf-8" ?>
+<nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
+	  xmlns:haf="https://github.com/haf/NLog.RabbitMQ/raw/master/src/schemas/NLog.RabbitMQ.xsd"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	  internalLogToConsole="true">
+
+	<extensions>
+		<add assembly="NLog.Targets.RabbitMQ" />
+	</extensions>
+
+	<targets async="true">
+		<!-- when http://nlog.codeplex.com/workitem/6491 is fixed, then xsi:type="haf:RabbitMQ" instead;
+			 these are the defaults (except 'topic' and 'appid'): 
+		-->
+		<target name="RabbitMQTarget"
+				xsi:type="RabbitMQ"
+				useJSON="true"
+				layout="${message}"
 				/>
 	</targets>
 
@@ -68,3 +103,46 @@ For an example of how to do this with WPF see the demo.
 ##Configuration schema
 
 See https://github.com/haf/NLog.RabbitMQ/blob/master/src/schemas/NLog.RabbitMQ.xsd
+
+## Value-Add - How to use with LogStash?
+
+First you [download logstash](http://logstash.net/)! Place it in a folder, and add a file that you call 'logstash.conf' next to it:
+
+```
+input {
+  amqp {
+    durable => true
+    exchange => "app-logging"
+    exclusive => false
+    format => "json_event"
+    host => "localhost"
+    key => "#"
+    name => ""
+    passive => false
+    password => "guest"
+    port => 5672
+    prefetch_count => 10
+    ssl => false
+    # tags => ... # array (optional)
+    type => "nlog"
+    user => "guest"
+    verify_ssl => false
+    vhost => "/"
+  }
+}
+
+output {
+  # Emit events to stdout for easy debugging of what is going through
+  # logstash.
+  stdout { }
+
+  # This will use elasticsearch to store your logs.
+  # The 'embedded' option will cause logstash to run the elasticsearch
+  # server in the same process, so you don't have to worry about
+  # how to download, configure, or run elasticsearch!
+  elasticsearch { embedded => true }
+}
+```
+
+You then start the monolithic logstash: `java -jar logstash-1.1.0-monolithic.jar agent -f logstash.conf -- web`.
+Now you can surf to http://127.0.0.1:9292 and search your logs that you're generating using the DemoApp in this project.

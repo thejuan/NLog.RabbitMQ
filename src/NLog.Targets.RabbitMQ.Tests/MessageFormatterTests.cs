@@ -22,7 +22,24 @@ namespace NLog.Targets.RabbitMQ.Tests
 				"MessageFormatterTests",
 				CultureInfo.InvariantCulture,
 				"Hello World",
-				null);
+				null,
+				GenerateException());
+
+			evt.Properties.Add("tags", new[] { "skurk:rånarligan" });
+		}
+
+		Exception GenerateException()
+		{
+			try
+			{
+				var a = 0;
+				var c = 1/a;
+			}
+			catch (Exception e)
+			{
+				return e;
+			}
+			return null;
 		}
 
 		/// <summary><see cref="LogLine"/></summary>
@@ -37,17 +54,44 @@ namespace NLog.Targets.RabbitMQ.Tests
 		[Test]
 		public void contains_message()
 		{
+			var json = LogLine();
+			Assert.That(json.Message, Is.EqualTo("Hello World"));
+		}
+
+		LogLine LogLine()
+		{
 			var res = MessageFormatter.GetMessageInner(true, l, evt);
 			Console.WriteLine(res);
-			dynamic json = JsonConvert.DeserializeObject(res);
-			Assert.That(json.message.ToString(), Is.EqualTo("Hello World"));
+			var json = JsonConvert.DeserializeObject<LogLine>(res);
+			return json;
 		}
 
 		[Test]
-		public void contains_no_exception()
+		public void contains_exception()
 		{
 			var res = MessageFormatter.GetMessageInner(true, l, evt);
-			Assert.That(res, Is.StringContaining(@"""exception"":null"));
+			Assert.That(res, Is.StringContaining(@"""exception"":"));
+		}
+
+		[Test]
+		public void level_is_debug()
+		{
+			var json = LogLine();
+			Assert.That(json.Level, Is.EqualTo("Debug"));
+		}
+
+		[Test]
+		public void source_scheme_is_nlog()
+		{
+			var json = LogLine();
+			Assert.That(json.Source.Scheme, Is.EqualTo("nlog"));
+		}
+
+		[Test]
+		public void contains_tags()
+		{
+			var json = LogLine();
+			CollectionAssert.AreEqual(new[]{"skurk:rånarligan"}, json.Tags);
 		}
 	}
 }

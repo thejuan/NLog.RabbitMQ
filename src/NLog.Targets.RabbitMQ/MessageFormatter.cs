@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 using NLog.Layouts;
@@ -21,15 +22,23 @@ namespace NLog.Targets
 			if (!useJSON)
 				return layout.Render(info);
 
-			return JsonConvert.SerializeObject(new LogLine
+			var logLine = new LogLine
 				{
-					TimeStampISO8601 = 
-						info.TimeStamp.ToUniversalTime()
-						.ToString("o", CultureInfo.InvariantCulture),
-					FullMessage = info.FormattedMessage,
-					Exception = info.Exception,
-					HostName = HostName
-				});
+					TimeStampISO8601 = info.TimeStamp.ToUniversalTime().ToString("o", CultureInfo.InvariantCulture),
+					Message = info.FormattedMessage,
+					Level = info.Level.Name,
+					Source = new Uri(string.Format("nlog://{0}/{1}", HostName, info.LoggerName))
+				};
+
+			logLine.AddField("exception", info.Exception);
+
+			if (info.Properties.Count > 0 && info.Properties.ContainsKey("tags"))
+				foreach (var tag in (IEnumerable<string>) info.Properties["tags"])
+					logLine.AddTag(tag);
+
+			logLine.EnsureADT();
+
+			return JsonConvert.SerializeObject(logLine);
 		}
 
 		public static long GetEpochTimeStamp(LogEventInfo @event)

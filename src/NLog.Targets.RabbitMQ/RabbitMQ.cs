@@ -10,7 +10,6 @@ using NLog.Layouts;
 
 namespace NLog.Targets
 {
-
 	/// <summary>
 	/// A RabbitMQ-target for NLog. See https://github.com/haf/NLog.RabbitMQ for documentation in Readme.md.
 	/// </summary>
@@ -22,6 +21,11 @@ namespace NLog.Targets
 		private readonly Encoding _Encoding = Encoding.UTF8;
 		private readonly Queue<Tuple<byte[], IBasicProperties, string>> _UnsentMessages
 			= new Queue<Tuple<byte[], IBasicProperties, string>>(512);
+
+		public RabbitMQ()
+		{
+			Layout = "${message}";
+		}
 
 		#region Properties
 
