@@ -6,7 +6,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace NLog.Targets.RabbitMQ.Listener
+namespace NLog.RabbitMQ.Listener
 {
 	#region *SentenceBuilder
 	/// <summary>

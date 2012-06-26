@@ -3,10 +3,11 @@
 using System;
 using System.Globalization;
 using NLog.Layouts;
+using NLog.Targets;
 using NUnit.Framework;
 using Newtonsoft.Json;
 
-namespace NLog.Targets.RabbitMQ.Tests
+namespace NLog.RabbitMQ.Tests
 {
 	public class MessageFormatterTests
 	{

@@ -1,10 +1,10 @@
 ﻿// Copyright 2012 Henrik Feldt
 
 using System;
-using NLog.Targets.RabbitMQ.Listener;
+using NLog.RabbitMQ.Listener;
 using NUnit.Framework;
 
-namespace NLog.Targets.RabbitMQ.Tests
+namespace NLog.RabbitMQ.Tests
 {
 	public class DurableFlagsTests
 	{
@@ -27,7 +27,7 @@ namespace NLog.Targets.RabbitMQ.Tests
 		{
 			var parse = Program.ParseArgsToFactory("-D", "my-q");
 			
-			parse.WithQueue(notTransient, Assert.Fail, qn => Assert.That(qn, Is.EqualTo("my-q")));
+			parse.WithQueue(notTransient, Assert.Fail, qn => Assert.That((object) qn, Is.EqualTo("my-q")));
 		}
 
 		[Test]

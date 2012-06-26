@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using NUnit.Framework;
 
-namespace NLog.Targets.RabbitMQ.Tests
+namespace NLog.RabbitMQ.Tests
 {
 	public class DateTimeTests
 	{

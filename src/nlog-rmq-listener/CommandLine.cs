@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.ComponentModel;
 using System.Threading;
 
-namespace NLog.Targets.RabbitMQ.Listener
+namespace NLog.RabbitMQ.Listener
 {
 	#region Attributes
 	/// <summary>

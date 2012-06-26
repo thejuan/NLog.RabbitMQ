@@ -9,7 +9,7 @@ using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 using RabbitMQ.Util;
 
-namespace NLog.Targets.RabbitMQ.Listener
+namespace NLog.RabbitMQ.Listener
 {
 	// SRP violated, I know, I know... But someone please think of the cohesion!!
 	public class Program

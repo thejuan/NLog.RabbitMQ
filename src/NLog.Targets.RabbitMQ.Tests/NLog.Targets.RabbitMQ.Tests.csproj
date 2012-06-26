@@ -8,7 +8,7 @@
     <ProjectGuid>{5D5C5B44-8376-4DA5-8361-F6B5D3CD6CEB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NLog.Targets.RabbitMQ.Tests</RootNamespace>
+    <RootNamespace>NLog.RabbitMQ.Tests</RootNamespace>
     <AssemblyName>NLog.Targets.RabbitMQ.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
