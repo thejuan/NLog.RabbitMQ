@@ -6,10 +6,10 @@ using System.Text;
 using NLog.Common;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Framing.v0_9_1;
+using NLog.Layouts;
 
 namespace NLog.Targets
 {
-	using NLog.Layouts;
 
 	/// <summary>
 	/// A RabbitMQ-target for NLog. See https://github.com/haf/NLog.RabbitMQ for documentation in Readme.md.
