@@ -165,7 +165,7 @@ namespace NLog.Targets
 			set { if (value > 0) _MaxBuffer = value; }
 		}
 
-		private ushort _heartBeatSeconds = 3;
+		ushort _HeartBeatSeconds = 3;
 
 		/// <summary>
 		/// Gets or sets the number of heartbeat seconds to have for the RabbitMQ connection.
@@ -174,10 +174,26 @@ namespace NLog.Targets
 		/// </summary>
 		public ushort HeartBeatSeconds
 		{
-			get { return _heartBeatSeconds; }
-			set {  _heartBeatSeconds = value; }
+			get { return _HeartBeatSeconds; }
+			set {  _HeartBeatSeconds = value; }
 		}
 
+		bool _UseJSON;
+
+		/// <summary>
+		/// Gets or sets whether to format the data in the body as a JSON structure.
+		/// Having it as a JSON structure means that you can more easily interpret the data
+		/// at its final resting place, than if it were a simple string - i.e. you don't
+		/// have to mess with advanced parsers if you have this options for all of your
+		/// applications. A product that you can use for viewing logs
+		/// generated is logstash (http://logstash.net), elasticsearch (https://github.com/elasticsearch/elasticsearch)
+		/// and kibana (http://rashidkpc.github.com/Kibana/)
+		/// </summary>
+		public bool UseJSON
+		{
+			get { return _UseJSON; }
+			set { _UseJSON = value; }
+		}
 
 		#endregion
 
@@ -251,28 +267,27 @@ namespace NLog.Targets
 			return routingKey;
 		}
 
-		private byte[] GetMessage(AsyncLogEventInfo logEvent)
+		private byte[] GetMessage(AsyncLogEventInfo info)
 		{
-			return _Encoding.GetBytes(Layout.Render(logEvent.LogEvent));
-		}
+			if (!_UseJSON)
+				return _Encoding.GetBytes(Layout.Render(info.LogEvent));
 
+
+		}
 
 		private IBasicProperties GetBasicProperties(AsyncLogEventInfo loggingEvent)
 		{
 			var @event = loggingEvent.LogEvent;
-			
-			var basicProperties = new BasicProperties();
-			basicProperties.ContentEncoding = "utf8";
-			basicProperties.ContentType = "text/plain";
-			basicProperties.AppId = AppId ?? @event.LoggerName;
 
-			basicProperties.Timestamp = new AmqpTimestamp(
-				Convert.ToInt64((@event.TimeStamp - _Epoch).TotalSeconds));
-
-			// support Validated User-ID (see http://www.rabbitmq.com/extensions.html)
-			basicProperties.UserId = UserName;
-
-			return basicProperties;
+			return new BasicProperties
+				{
+					ContentEncoding = "utf8",
+					ContentType = _UseJSON ? "application/json" : "text/plain",
+					AppId = AppId ?? @event.LoggerName,
+					Timestamp = new AmqpTimestamp(
+						Convert.ToInt64((@event.TimeStamp - _Epoch).TotalSeconds)),
+					UserId = UserName // support Validated User-ID (see http://www.rabbitmq.com/extensions.html)
+				};
 		}
 
 		protected override void InitializeTarget()
