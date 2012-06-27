@@ -154,6 +154,8 @@ Description: Will create an adjacent file 'log.txt' and also output all log data
 							using (var c = opts.Factory.CreateConnection())
 							using (var m = c.CreateModel())
 							{
+								m.BasicQos(0u, 100, false); // http://www.rabbitmq.com/amqp-0-9-1-reference.html#basic.qos.prefetch-size
+
 								var consumer = new QueueingBasicConsumer(m);
 
 								m.ExchangeDeclarePassive(opts.Exchange);
