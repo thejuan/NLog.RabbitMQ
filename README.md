@@ -49,7 +49,8 @@ You will find the listener tool in the nuget `tools` folder.
 ```
 
 Minimum target recommended:
-```
+
+```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
 	  xmlns:haf="https://github.com/haf/NLog.RabbitMQ/raw/master/src/schemas/NLog.RabbitMQ.xsd"
@@ -77,6 +78,8 @@ Minimum target recommended:
 
 </nlog>
 ```
+
+Remember to mark your `NLog.config` file to be copied to the output directory!
 
 **Recommendation - async wrapper target**
 
