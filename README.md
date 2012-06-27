@@ -21,7 +21,7 @@ You will find the listener tool in the nuget `tools` folder.
 
 	<targets async="true">
 		<!-- when http://nlog.codeplex.com/workitem/6491 is fixed, then xsi:type="haf:RabbitMQ" instead;
-			 these are the defaults (except 'topic' and 'appid'): 
+			 these are the defaults (except 'topic', 'appid', and 'useJSON'): 
 		-->
 		<target name="RabbitMQTarget"
 				xsi:type="RabbitMQ"
