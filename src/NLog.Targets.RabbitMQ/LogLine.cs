@@ -34,6 +34,7 @@ namespace NLog.Targets
 		{
 			if (line.Fields == null)
 				line.Fields = new Dictionary<string, object>();
+
 			if (line.Tags == null)
 				line.Tags = new HashSet<string>();
 		}

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using NLog;
@@ -30,7 +31,15 @@ namespace DemoApp
 					logger.DebugTag("This is a sample debug message", "important");
 					break;
 				case "Info":
-					logger.Info("This is a sample info message");
+					logger.Log(LogLevel.Info, "This is a sample info message", fields: new Dictionary<string, object>
+						{
+							{ "button-sender", b.Name }
+						});
+					break;
+				case "Info2":
+					logger.LogFields(LogLevel.Info, "This is a sample info message with 2 fields",
+						Tuple.Create("App", "DemoApp"),
+						Tuple.Create("Heuristic", "Random"));
 					break;
 				case "Warn":
 					logger.Warn("This is a sample warn message");

@@ -21,7 +21,7 @@ You will find the listener tool in the nuget `tools` folder.
 
 	<targets async="true">
 		<!-- when http://nlog.codeplex.com/workitem/6491 is fixed, then xsi:type="haf:RabbitMQ" instead;
-			 these are the defaults (except 'topic' and 'appid'): 
+			 these are the defaults (except 'topic', 'appid', and 'useJSON'): 
 		-->
 		<target name="RabbitMQTarget"
 				xsi:type="RabbitMQ"
@@ -49,7 +49,8 @@ You will find the listener tool in the nuget `tools` folder.
 ```
 
 Minimum target recommended:
-```
+
+```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
 	  xmlns:haf="https://github.com/haf/NLog.RabbitMQ/raw/master/src/schemas/NLog.RabbitMQ.xsd"
@@ -77,6 +78,8 @@ Minimum target recommended:
 
 </nlog>
 ```
+
+Remember to mark your `NLog.config` file to be copied to the output directory!
 
 **Recommendation - async wrapper target**
 
@@ -106,7 +109,7 @@ See https://github.com/haf/NLog.RabbitMQ/blob/master/src/schemas/NLog.RabbitMQ.x
 
 ## Value-Add - How to use with LogStash?
 
-First you [download logstash](http://logstash.net/)! Place it in a folder, and add a file that you call 'logstash.conf' next to it:
+Make sure you are using the flag `useJSON='true'` in your configuration, then you [download logstash](http://logstash.net/)! Place it in a folder, and add a file that you call 'logstash.conf' next to it:
 
 ```
 input {

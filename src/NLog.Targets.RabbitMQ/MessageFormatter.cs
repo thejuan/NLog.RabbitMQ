@@ -32,6 +32,10 @@ namespace NLog.Targets
 
 			logLine.AddField("exception", info.Exception);
 
+			if (info.Properties.Count > 0 && info.Properties.ContainsKey("fields"))
+				foreach (var kv in (IEnumerable<KeyValuePair<string, object>>) info.Properties["fields"])
+					logLine.AddField(kv.Key, kv.Value);
+
 			if (info.Properties.Count > 0 && info.Properties.ContainsKey("tags"))
 				foreach (var tag in (IEnumerable<string>) info.Properties["tags"])
 					logLine.AddTag(tag);
