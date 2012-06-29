@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DateTimeTests.cs" />
+    <Compile Include="LevelFilterTests.cs" />
     <Compile Include="MessageFormatterTests.cs" />
     <Compile Include="DurableFlagsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
