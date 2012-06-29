@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
-using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
@@ -28,13 +27,13 @@ namespace NLog.RabbitMQ.Listener
 			[Option("u", "username", DefaultValue = "guest", HelpText = "Username for authenticating. Default 'guest'.")]
 			public string UserName { get; set; }
 
-			[Option(null, "virtual-host", DefaultValue = "/", HelpText = "VHost to listen to. Default '/'.")]
+			[Option("v", "virtual-host", DefaultValue = "/", HelpText = "VHost to listen to. Default '/'.")]
 			public string VHost { get; set; }
 
-			[Option(null, "pretty-json", DefaultValue = false, HelpText = "Expect log output to be JSON and try to output it pretty. Default 'false'.")]
+			[Option("j", "pretty-json", DefaultValue = false, HelpText = "Expect log output to be JSON and try to output it pretty. Default 'false'.")]
 			public bool PrettyJSON { get; set; }
 
-			[Option(null, "basic-props", DefaultValue = false, HelpText = "Also output the IBasicProperties data from the RMQ envelope. Default 'false'.")]
+			[Option("b", "basic-props", DefaultValue = false, HelpText = "Also output the IBasicProperties data from the RMQ envelope. Default 'false'.")]
 			public bool BasicProps { get; set; }
 
 			[Option("d", "durable", DefaultValue = null, HelpText = 
@@ -53,6 +52,14 @@ namespace NLog.RabbitMQ.Listener
 			[Option("k", "routing-key", DefaultValue = "#", HelpText = "The routing key " +
 				"which you wish to target your listener to. Default '#'.")]
 			public string RoutingKey { get; set; }
+
+			[Option("l", "level", DefaultValue = "Trace", HelpText = "The level with which you " +
+				"wish to watch events as they come in. Default 'Trace', requires flag '-j'/'--pretty-json'.")]
+			public string Level { get; set; }
+
+			[Option(null, "file-out", DefaultValue = true, HelpText = "Whether to write to a " +
+				"file as well as write to console. Default 'true'.")]
+			public bool WriteToFile { get; set; }
 
 			[HelpOption]
 			public string GetUsage()
@@ -154,6 +161,8 @@ Description: Will create an adjacent file 'log.txt' and also output all log data
 							using (var c = opts.Factory.CreateConnection())
 							using (var m = c.CreateModel())
 							{
+								m.BasicQos(0u, 100, false); // http://www.rabbitmq.com/amqp-0-9-1-reference.html#basic.qos.prefetch-size
+
 								var consumer = new QueueingBasicConsumer(m);
 
 								m.ExchangeDeclarePassive(opts.Exchange);
@@ -234,24 +243,23 @@ Description: Will create an adjacent file 'log.txt' and also output all log data
 				if (opts.BasicProps)
 					DebugUtil.DumpProperties(msg.BasicProperties, Console.Out, 1);
 
-				var input = msg.Body.AsUtf8String();
-				string output;
-				try
+				string output,
+					   formatted,
+					   input = msg.Body.AsUtf8String();
+
+				if (opts.PrettyJSON)
 				{
-					output = opts.PrettyJSON
-					             	? JsonConvert.SerializeObject(
-					             		JsonConvert.DeserializeObject(input),
-					             		Formatting.Indented)
-					             	: input;
+					if (!LevelFilter.ShouldPrint(input, LogLevel.FromString(opts.Level), out formatted))
+						continue;
+
+					output = formatted;
 				}
-				catch (Exception e)
-				{
-					Console.Error.WriteLine(e);
-					output = input;
-				}
+					
+				else output = input;
 
 				Console.WriteLine(output);
-				WriteToFile(output);
+
+				if (opts.WriteToFile) WriteToFile(output);
 			}
 		}
 

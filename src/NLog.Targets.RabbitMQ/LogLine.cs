@@ -23,6 +23,9 @@ namespace NLog.Targets
 		[JsonProperty("@tags")]
 		public HashSet<string> Tags { get; set; }
 
+		[JsonProperty("@type")]
+		public string Type { get; set; }
+
 		[JsonProperty("level")]
 		public string Level { get; set; }
 	}
