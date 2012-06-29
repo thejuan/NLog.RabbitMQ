@@ -149,3 +149,24 @@ output {
 
 You then start the monolithic logstash: `java -jar logstash-1.1.0-monolithic.jar agent -f logstash.conf -- web`.
 Now you can surf to http://127.0.0.1:9292 and search your logs that you're generating using the DemoApp in this project.
+
+You can now log from e.g. your web site like this:
+
+```
+var request = ((HttpApplication)sender).Request; // or HttpContext.Current.Request;
+_logger.Log(LogLevel.Debug,
+		string.Format("{0} {1}", request.HttpMethod, request.Path),
+		tags: new[] {"requests"},
+		fields: new Dictionary<string, object>
+			{
+				{"REMOTE_ADDR", request.ServerVariables["REMOTE_ADDR"] ?? ""},
+				{"HTTP_USER_AGENT", request.ServerVariables["HTTP_USER_AGENT"] ?? ""}
+			});
+```
+
+Added overloads to `NLog.Logger`: 
+
+```
+Logger.Log(level : LogLevel, message : String, parameters : object[], exception : Exception, tags : string[], fields : IDictionary<string, object>
+Logger.{Fatal|Error|Warn|Info|Debug|Trace}Tag(message : String, tags : params string[])
+```

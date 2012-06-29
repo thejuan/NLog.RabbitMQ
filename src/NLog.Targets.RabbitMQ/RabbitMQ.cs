@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading.Tasks;
 using NLog.Common;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Framing.v0_9_1;
@@ -202,9 +203,10 @@ namespace NLog.Targets
 
 		protected override void Write(AsyncLogEventInfo logEvent)
 		{
+			var continuation = logEvent.Continuation;
 			var basicProperties = GetBasicProperties(logEvent);
 			var message = GetMessage(logEvent);
-			var routingKey = this.GetTopic(logEvent.LogEvent);
+			var routingKey = GetTopic(logEvent.LogEvent);
 
 			if (_Model == null || !_Model.IsOpen)
 				StartConnection();
@@ -223,17 +225,19 @@ namespace NLog.Targets
 			}
 			catch (IOException e)
 			{
-				InternalLogger.Error("Could not send to RabbitMQ instance! {0}", e.ToString());
+				AddUnsent(routingKey, basicProperties, message);
+				continuation(e);
+				//InternalLogger.Error("Could not send to RabbitMQ instance! {0}", e.ToString());
 			}
 			catch (ObjectDisposedException e)
 			{
-				InternalLogger.Error("Could not write data to the network stream! {0}", e.ToString());
+				AddUnsent(routingKey, basicProperties, message);
+				continuation(e);
+				//InternalLogger.Error("Could not write data to the network stream! {0}", e.ToString());
 			}
 
-			AddUnsent(routingKey, basicProperties, message);
 			ShutdownAmqp(_Connection, new ShutdownEventArgs(ShutdownInitiator.Application,
-				Constants.ChannelError, "Could not talk to RabbitMQ instance"));
-
+															Constants.ChannelError, "Could not talk to RabbitMQ instance"));
 		}
 
 		private void AddUnsent(string routingKey, IBasicProperties basicProperties, byte[] message)
@@ -302,24 +306,33 @@ namespace NLog.Targets
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		private void StartConnection()
 		{
-			try
-			{
-				_Connection = GetConnectionFac().CreateConnection();
-				_Connection.ConnectionShutdown += ShutdownAmqp;
-
-				try { _Model = _Connection.CreateModel(); }
-				catch (Exception e)
+			var t = Task.Factory.StartNew(() =>
 				{
-					InternalLogger.Error("could not create model, {0}", e);
-				}
+					try
+					{
+						_Connection = GetConnectionFac().CreateConnection();
+						_Connection.ConnectionShutdown += ShutdownAmqp;
 
-				if (_Model != null)
-					_Model.ExchangeDeclare(_Exchange, ExchangeType.Topic, _Durable);
-			}
-			catch (Exception e)
-			{
-				InternalLogger.Error(string.Format("could not connect to Rabbit instance, {0}", e));
-			}
+						try
+						{
+							_Model = _Connection.CreateModel();
+						}
+						catch (Exception e)
+						{
+							InternalLogger.Error("could not create model, {0}", e);
+						}
+
+						if (_Model != null)
+							_Model.ExchangeDeclare(_Exchange, ExchangeType.Topic, _Durable);
+					}
+					catch (Exception e)
+					{
+						InternalLogger.Error(string.Format("could not connect to Rabbit instance, {0}", e));
+					}
+				});
+
+			if (!t.Wait(TimeSpan.FromMilliseconds(30)))
+				InternalLogger.Warn("starting connection-task timed out, continuing");
 		}
 
 		private ConnectionFactory GetConnectionFac()

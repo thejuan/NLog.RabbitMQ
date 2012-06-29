@@ -27,6 +27,7 @@ namespace NLog.Targets
 					TimeStampISO8601 = info.TimeStamp.ToUniversalTime().ToString("o", CultureInfo.InvariantCulture),
 					Message = info.FormattedMessage,
 					Level = info.Level.Name,
+					Type = "amqp",
 					Source = new Uri(string.Format("nlog://{0}/{1}", HostName, info.LoggerName))
 				};
 
