@@ -1,5 +1,5 @@
 # RabbitMQ target for NLog
-
+ 
 The RabbitMQ target writes asynchronously to a RabbitMQ instance. Either use this repo, ur get the nuget:
 
 `Install-Package NLog.RabbitMQ`
