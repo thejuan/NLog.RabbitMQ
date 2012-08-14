@@ -323,7 +323,21 @@ namespace NLog.Targets
 						}
 
 						if (_Model != null)
-							_Model.ExchangeDeclare(_Exchange, ExchangeType.Topic, _Durable);
+						{
+							try
+							{
+								_Model.ExchangeDeclare(_Exchange, ExchangeType.Topic, _Durable);
+							}
+							catch (Exception e)
+							{
+								if (_Model != null)
+								{
+									_Model.Dispose();
+									_Model = null;
+								}
+								InternalLogger.Error(string.Format("could not declare exchange, {0}", e));
+							}
+						}
 					}
 					catch (Exception e)
 					{
