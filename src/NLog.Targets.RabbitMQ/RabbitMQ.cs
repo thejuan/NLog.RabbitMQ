@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using NLog.Common;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Framing.v0_9_1;
+using MQExchangeType = RabbitMQ.Client.ExchangeType;
 using NLog.Layouts;
 
 namespace NLog.Targets
@@ -135,6 +136,25 @@ namespace NLog.Targets
 			get { return _Exchange; }
 			set { if (value != null) _Exchange = value; }
 		}
+        private string _ExchangeType = MQExchangeType.Topic;
+
+        /// <summary>
+        ///   Gets or sets the exchange type to bind the logger output to.
+        /// </summary>
+        /// <remarks>
+        ///   Default is 'topic'
+        /// </remarks>
+        public string ExchangeType
+        {
+            get { return _ExchangeType; }
+            set
+            {
+                if (String.IsNullOrEmpty(value))
+                    return;
+
+                _ExchangeType = value;
+            }
+        }
 
 		private bool _Durable = true;
 
@@ -326,7 +346,7 @@ namespace NLog.Targets
 						{
 							try
 							{
-								_Model.ExchangeDeclare(_Exchange, ExchangeType.Topic, _Durable);
+								_Model.ExchangeDeclare(_Exchange, _ExchangeType, _Durable);
 							}
 							catch (Exception e)
 							{
