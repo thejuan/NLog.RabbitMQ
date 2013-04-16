@@ -38,6 +38,7 @@ You will find the listener tool in the nuget `tools` folder.
 				heartBeatSeconds="3"
 				useJSON="true"
 				layout="${message}"
+				compression="none"
 				/>
 	</targets>
 
