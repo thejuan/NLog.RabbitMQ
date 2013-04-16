@@ -31,6 +31,7 @@
 					<element name="maxBuffer" type="integer" minOccurs="0" maxOccurs="1" />
 					<element name="heartBeatSeconds" type="unsignedShort" minOccurs="0" maxOccurs="1" />
 					<element name="useJSON" type="boolean" minOccurs="0" maxOccurs="1" />
+					<element name="compression" type="string" minOccurs="0" maxOccurs="1" />
 				</choice>
 				 <attribute name="name" type="string">
 					 <annotation>
@@ -92,6 +93,11 @@
 						 <documentation>Whether to publish the message as a JSON structure (recommended!)</documentation>
 					 </annotation>
 				 </attribute>
+				<attribute name="compression" type="string" default="none">
+					<annotation>
+						<documentation>Compression type: none, gzip</documentation>
+					</annotation>
+				</attribute>				 
 			</extension>
 		</complexContent>
 	</complexType>
