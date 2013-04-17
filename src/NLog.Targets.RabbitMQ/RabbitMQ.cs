@@ -8,6 +8,7 @@ using NLog.Common;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Framing.v0_9_1;
 using NLog.Layouts;
+using System.IO.Compression;
 
 namespace NLog.Targets
 {
@@ -17,6 +18,8 @@ namespace NLog.Targets
 	[Target("RabbitMQ")]
 	public class RabbitMQ : TargetWithLayout
 	{
+		public enum CompressionTypes { None, GZip };
+		
 		private IConnection _Connection;
 		private IModel _Model;
 		private readonly Encoding _Encoding = Encoding.UTF8;
@@ -26,6 +29,7 @@ namespace NLog.Targets
 		public RabbitMQ()
 		{
 			Layout = "${message}";
+			Compression = CompressionTypes.None;
 		}
 
 		#region Properties
@@ -199,13 +203,20 @@ namespace NLog.Targets
 			set { _UseJSON = value; }
 		}
 
+		/// <summary>
+		/// Gets or sets compression type. 
+		/// Available compression methods: None, GZip
+		/// </summary>
+		public CompressionTypes Compression { get; set; }
+		
 		#endregion
 
 		protected override void Write(AsyncLogEventInfo logEvent)
 		{
 			var continuation = logEvent.Continuation;
 			var basicProperties = GetBasicProperties(logEvent);
-			var message = GetMessage(logEvent);
+			var uncompressedMessage = GetMessage(logEvent);
+			var message = CompressMessage(uncompressedMessage);
 			var routingKey = GetTopic(logEvent.LogEvent);
 
 			if (_Model == null || !_Model.IsOpen)
@@ -404,5 +415,35 @@ namespace NLog.Targets
 			
 			base.CloseTarget();
 		}
+		
+		private byte[] CompressMessage(byte[] messageBytes)
+		{
+		    switch (Compression)
+		    {
+		        case CompressionTypes.None:
+		            return messageBytes;
+		        case CompressionTypes.GZip:
+		            return CompressMessageGZip(messageBytes);
+		        default:
+		            throw new NLogConfigurationException(string.Format("Compression type '{0}' not supported.", Compression));
+		    }
+		}
+		
+		/// <summary>
+		/// Compresses bytes using GZip data format
+		/// </summary>
+		/// <param name="messageBytes"></param>
+		/// <returns></returns>
+		private byte[] CompressMessageGZip(byte[] messageBytes)
+		{
+		    var gzipCompressedMemStream = new MemoryStream();
+		    using (var gzipStream = new GZipStream(gzipCompressedMemStream, CompressionMode.Compress))
+		    {
+		        gzipStream.Write(messageBytes, 0, messageBytes.Length);
+		    }
+		
+		    return gzipCompressedMemStream.ToArray();
+		}		
+
 	}
 }
