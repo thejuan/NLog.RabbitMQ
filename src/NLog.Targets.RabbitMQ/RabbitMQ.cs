@@ -19,8 +19,8 @@ namespace NLog.Targets
 	public class RabbitMQ : TargetWithLayout
 	{
 		public enum CompressionTypes { None, GZip };
-        	
-        	private IConnection _Connection;
+		
+		private IConnection _Connection;
 		private IModel _Model;
 		private readonly Encoding _Encoding = Encoding.UTF8;
 		private readonly Queue<Tuple<byte[], IBasicProperties, string>> _UnsentMessages
@@ -208,7 +208,7 @@ namespace NLog.Targets
 		/// Available compression methods: None, GZip
 		/// </summary>
 		public CompressionTypes Compression { get; set; }
-        
+		
 		#endregion
 
 		protected override void Write(AsyncLogEventInfo logEvent)
