@@ -57,6 +57,10 @@
 					 <annotation>
 						<documentation>The exchange to bind the logger output to.</documentation>
 					</annotation>
+				 <attribute name="exchangetype" type="string" default="topic">
+					 <annotation>
+						<documentation>The exchange type to bind to logger output to. This must be a supported topic type by RabbitMQ.</documentation>
+					</annotation>
 				</attribute>
 				 <attribute name="port" type="unsignedShort" default="5672">
 					 <annotation>
