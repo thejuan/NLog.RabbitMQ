@@ -203,6 +203,41 @@ namespace NLog.Targets
 			set { _UseJSON = value; }
 		}
 
+		bool _UseSsl;
+
+		/// <summary>
+		/// Enables SSL support to connect to the Message Queue. If this is enabled, 
+		/// SslCertPath and SslCertPassphrase are required! For more information please
+		/// visit http://www.rabbitmq.com/ssl.html
+		/// </summary>
+		public bool UseSsl
+		{
+			get { return _UseSsl; }
+			set { _UseSsl = value; }
+		}
+
+		string _SslCertPath;
+
+		/// <summary>
+		/// Location of client SSL certificate
+		/// </summary>
+		public string SslCertPath
+		{
+			get { return _SslCertPath; }
+			set { _SslCertPath = value; }
+		}
+
+		string _SslCertPassphrase;
+
+		/// <summary>
+		/// Passphrase for generated SSL certificate defined in SslCertPath
+		/// </summary>
+		public string SslCertPassphrase
+		{
+			get { return _SslCertPassphrase; }
+			set { _SslCertPassphrase = value; }
+		}
+
 		/// <summary>
 		/// Gets or sets compression type. 
 		/// Available compression methods: None, GZip
@@ -369,7 +404,14 @@ namespace NLog.Targets
 				UserName = UserName,
 				Password = Password,
 				RequestedHeartbeat = HeartBeatSeconds,
-				Port = Port
+				Port = Port,
+				Ssl = new SslOption()
+				{
+					Enabled = UseSsl,
+					CertPath = SslCertPath,
+					CertPassphrase = SslCertPassphrase,
+					ServerName = HostName
+				}
 			};
 		}
 
