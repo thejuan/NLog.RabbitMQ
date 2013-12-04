@@ -1,6 +1,7 @@
 ﻿// Copyright 2012 Henrik Feldt
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using NLog.Layouts;
 using NLog.Targets;
@@ -109,6 +110,21 @@ namespace NLog.RabbitMQ.Tests
 			evt.Properties.Add(42, "Some value");
 			var json = LogLine();
 			CollectionAssert.DoesNotContain(json.Fields.Values, "Some value");
+		}
+
+		[Test]
+		public void custom_property_named_tags_is_ignored()
+		{
+			var json = LogLine();
+			Assert.False(json.Fields.ContainsKey("tags"));
+		} 
+
+		[Test]
+		public void custom_property_named_fields_is_ignored()
+		{
+			evt.Properties.Add("fields", new Dictionary<string, object>());
+			var json = LogLine();
+			Assert.False(json.Fields.ContainsKey("fields"));
 		}
 	}
 }

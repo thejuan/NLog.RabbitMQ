@@ -42,8 +42,14 @@ namespace NLog.Targets
 				foreach (var tag in (IEnumerable<string>) info.Properties["tags"])
 					logLine.AddTag(tag);
 
-			foreach (var propertyPair in info.Properties.Where(kp => kp.Key is string))
+			foreach (var propertyPair in info.Properties)
+			{
+				var key = propertyPair.Key as string;
+				if (key == null || key == "tags" || key == "fields")
+					continue;
+				
 				logLine.AddField((string) propertyPair.Key, propertyPair.Value);
+			}
 
 			logLine.EnsureADT();
 
