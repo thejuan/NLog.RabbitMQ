@@ -1,6 +1,7 @@
 ﻿// Copyright 2012 Henrik Feldt
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using NLog.Layouts;
 using NLog.Targets;
@@ -93,6 +94,37 @@ namespace NLog.RabbitMQ.Tests
 		{
 			var json = LogLine();
 			CollectionAssert.AreEqual(new[]{"skurk:rånarligan"}, json.Tags);
+		}
+		
+		[Test]
+		public void contains_custom_properties()
+		{
+			evt.Properties.Add("requestId", "This request");
+			var json = LogLine();
+			Assert.AreEqual("This request", json.Fields["requestId"]);
+		}
+		
+		[Test]
+		public void ignores_custom_properties_with_non_string_keys()
+		{
+			evt.Properties.Add(42, "Some value");
+			var json = LogLine();
+			CollectionAssert.DoesNotContain(json.Fields.Values, "Some value");
+		}
+
+		[Test]
+		public void custom_property_named_tags_is_ignored()
+		{
+			var json = LogLine();
+			Assert.False(json.Fields.ContainsKey("tags"));
+		} 
+
+		[Test]
+		public void custom_property_named_fields_is_ignored()
+		{
+			evt.Properties.Add("fields", new Dictionary<string, object>());
+			var json = LogLine();
+			Assert.False(json.Fields.ContainsKey("fields"));
 		}
 	}
 }
