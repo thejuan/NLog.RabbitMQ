@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net;
 using NLog.Layouts;
 using Newtonsoft.Json;
@@ -41,7 +42,10 @@ namespace NLog.Targets
 				foreach (var tag in (IEnumerable<string>) info.Properties["tags"])
 					logLine.AddTag(tag);
 
-			logLine.EnsureADT();
+            foreach (var propertyPair in info.Properties.Where(kp => kp.Key is string))
+		        logLine.AddField((string) propertyPair.Key, propertyPair.Value);
+
+		    logLine.EnsureADT();
 
 			return JsonConvert.SerializeObject(logLine);
 		}
