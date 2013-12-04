@@ -94,21 +94,21 @@ namespace NLog.RabbitMQ.Tests
 			var json = LogLine();
 			CollectionAssert.AreEqual(new[]{"skurk:rånarligan"}, json.Tags);
 		}
-        
-        [Test]
+		
+		[Test]
 		public void contains_custom_properties()
 		{
-            evt.Properties.Add("requestId", "This request");
+			evt.Properties.Add("requestId", "This request");
 			var json = LogLine();
-            Assert.AreEqual("This request", json.Fields["requestId"]);
+			Assert.AreEqual("This request", json.Fields["requestId"]);
 		}
-        
-        [Test]
+		
+		[Test]
 		public void ignores_custom_properties_with_non_string_keys()
 		{
-            evt.Properties.Add(42, "Some value");
+			evt.Properties.Add(42, "Some value");
 			var json = LogLine();
-            CollectionAssert.DoesNotContain(json.Fields.Values, "Some value");
+			CollectionAssert.DoesNotContain(json.Fields.Values, "Some value");
 		}
 	}
 }

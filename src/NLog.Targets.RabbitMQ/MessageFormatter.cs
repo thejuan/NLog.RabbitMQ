@@ -42,10 +42,10 @@ namespace NLog.Targets
 				foreach (var tag in (IEnumerable<string>) info.Properties["tags"])
 					logLine.AddTag(tag);
 
-            foreach (var propertyPair in info.Properties.Where(kp => kp.Key is string))
-		        logLine.AddField((string) propertyPair.Key, propertyPair.Value);
+			foreach (var propertyPair in info.Properties.Where(kp => kp.Key is string))
+				logLine.AddField((string) propertyPair.Key, propertyPair.Value);
 
-		    logLine.EnsureADT();
+			logLine.EnsureADT();
 
 			return JsonConvert.SerializeObject(logLine);
 		}
