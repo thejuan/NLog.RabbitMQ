@@ -36,7 +36,7 @@ namespace NLog.Targets
 		#region Properties
 
 		private string _VHost = "/";
-	    private string _ContentType;
+        private string _ContentType;
 
 		/// <summary>
 		/// 	Gets or sets the virtual host to publish to.
@@ -369,13 +369,13 @@ namespace NLog.Targets
 				};
 		}
 
-	    private string GetContentType()
-	    {
-	        if (!string.IsNullOrEmpty(ContentType))
-	            return ContentType;
+        private string GetContentType()
+        {
+            if (!string.IsNullOrEmpty(ContentType))
+                return ContentType;
 
-	        return _UseJSON ? "application/json" : "text/plain";
-	    }
+            return _UseJSON ? "application/json" : "text/plain";
+        }
 
 		protected override void InitializeTarget()
 		{
