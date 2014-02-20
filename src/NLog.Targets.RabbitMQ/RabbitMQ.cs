@@ -36,6 +36,7 @@ namespace NLog.Targets
 		#region Properties
 
 		private string _VHost = "/";
+	    private string _ContentType;
 
 		/// <summary>
 		/// 	Gets or sets the virtual host to publish to.
@@ -45,6 +46,15 @@ namespace NLog.Targets
 			get { return _VHost; }
 			set { if (value != null) _VHost = value; }
 		}
+
+        /// <summary>
+        /// 	Gets or sets the message ContentType.
+        /// </summary>
+        public string ContentType
+        {
+            get { return _ContentType; }
+            set { if (value != null) _ContentType = value; }
+        }
 
 		private string _UserName = "guest";
 
@@ -352,12 +362,20 @@ namespace NLog.Targets
 			return new BasicProperties
 				{
 					ContentEncoding = "utf8",
-					ContentType = _UseJSON ? "application/json" : "text/plain",
+                    ContentType = GetContentType(),
 					AppId = AppId ?? @event.LoggerName,
 					Timestamp = new AmqpTimestamp(MessageFormatter.GetEpochTimeStamp(@event)),
 					UserId = UserName // support Validated User-ID (see http://www.rabbitmq.com/extensions.html)
 				};
 		}
+
+	    private string GetContentType()
+	    {
+	        if (!string.IsNullOrEmpty(ContentType))
+	            return ContentType;
+
+	        return _UseJSON ? "application/json" : "text/plain";
+	    }
 
 		protected override void InitializeTarget()
 		{
